@@ -52,9 +52,9 @@ def score_line(line: List[Card]) -> float:
     score += (top.hp or 0) * 0.5
     if top.attacks:
         best_atk = max(top.attacks, key=lambda a: a.damage)
-        # damage per energy invested -- efficiency matters more than raw number
+        
         score += best_atk.damage / max(1, best_atk.energy_count()) * 3
-    # Shorter lines (Basic/Stage1 only) are faster and more consistent
+    
     score += (3 - len(line)) * 15
     return score
 
@@ -70,8 +70,8 @@ def build_deck(cards: Dict[str, Card], primary_type: str = None,
         if c.is_basic:
             basics_by_type[c.ptype].append(c)
 
-    # Auto-pick primary type = the evolution line with the best score,
-    # unless caller specifies one (lets you target a specific matchup plan).
+    
+    
     if primary_type is None:
         best_line, best_score = None, -1
         for t, basics in basics_by_type.items():
@@ -83,15 +83,15 @@ def build_deck(cards: Dict[str, Card], primary_type: str = None,
     primary_line = _evolution_line(cards, basics_by_type[primary_type][0])
 
     if secondary_type is None:
-        # Pick a type whose weakness isn't the primary type's weakness
-        # (hedge against a single bad matchup)
+        
+        
         candidates = [t for t in basics_by_type if t != primary_type]
         secondary_type = candidates[0] if candidates else primary_type
     secondary_line = _evolution_line(cards, basics_by_type[secondary_type][0])
 
     decklist: Dict[str, int] = defaultdict(int)
 
-    # --- Pokemon package (primary: 4 copies of each stage; secondary: 3) ---
+    
     for c in primary_line:
         decklist[c.card_id] += min(MAX_COPIES_NONENERGY, 4)
     for c in secondary_line:
@@ -109,7 +109,7 @@ def build_deck(cards: Dict[str, Card], primary_type: str = None,
         if t_i > 200:
             break
 
-    # --- Energy (fill remainder, split across the two colors we need) ---
+    
     used = sum(decklist.values())
     remaining = DECK_SIZE - used
     primary_energy_type = _energy_card_for_type(energies, primary_type)
